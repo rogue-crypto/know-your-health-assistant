@@ -89,7 +89,7 @@ async function initiateScanProcess() {
             {
                 parts: [
                     {
-                        text: `You are a healthcare assistant specializing in dermatology. Analyze the uploaded image and provide the following information in strict JSON format only. Do not use any other characters or explanations. 
+                        text: `You are a healthcare assistant specializing in dermatology. Analyze the uploaded image and provide the following information in strict JSON format only. Do not use any other characters or explanations. Please keep in mind to analyze the small red patches in any pictures and identify diseases like kertolysis, ketoderma, eczema and atopic dermatitis. Keep all of the skin diseases in mind no matter how rare and attempt to analyze them with your best ability and find details about them in that manner. Keep in mind the picture given and match the picture with all types of skin diseases or infections you can find on the internet to ensure that there is no image of something like an infection and 'No skin disease detected' comes up. your job is to help the users and be the best you can. Be the best you can and train yourself to be the most accurate chatbot ever. Learn and learn again from the internet and become the optimal skin suggestor. Now LOOK at the image and suggest! match it with the most likely skin diseases and give a response.
                         {
                             "diseaseName": "Name of the disease (add an or if there are multiple possible diseases with high confidence level like with vitiligo and pityriasis alba) or 'No visible disease detected'",
                             "type": "Type of the disease or 'Not Available'",
