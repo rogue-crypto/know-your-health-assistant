@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Know Your Health Assistant</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header class="header">
+        <h1>Know Your Health Assistant <i class="fas fa-stethoscope"></i></h1>
+    </header>
+    <main class="main-content">
+        <section class="card">
+            <form id="uploadForm" class="upload-form"> 
+                <div class="file-upload">
+                    <label for="imageInput" class="upload-label">
+                         Choose an Image
+                        <input type="file" id="imageInput" accept="image/*" hidden />
+                    </label>
+                    <input type="text" class="file-path" placeholder="No file selected" readonly />
+                </div>
+                <button type="submit" id="scanBtn" class="scan-btn" disabled><i class="fas fa-search"></i> Scan</button>
+            </form>
+            <div id="imagePreview" class="image-preview"></div>
+        </section>
+
+        <div id="progressBar" class="progress-bar" style="display: none;">
+            <div class="progress-indeterminate"></div>
+        </div>
+
+        <section id="result" class="result-container"></section>
+
+        <button id="newChatBtn" class="new-chat-btn" style="display: none;" disabled><i class="fas fa-sync-alt"></i> New Chat</button>
+    </main>
+    
+    <footer class="footer">
+        <p>&copy; 2024 Know Your Health Assistant</p>
+    </footer>
+    
+    <script type="module" src="index.js"></script>
+</body>
+</html>
