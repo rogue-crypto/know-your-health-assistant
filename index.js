@@ -89,15 +89,17 @@ async function initiateScanProcess() {
             {
                 parts: [
                     {
-                        text: `You are a healthcare assistant specializing in dermatology. Analyze the uploaded image and provide the following information in strict JSON format only. Do not use any other characters or explanations. Please keep in mind to analyze the small red patches in any pictures and identify diseases like kertolysis, ketoderma, eczema and atopic dermatitis. Keep all of the skin diseases in mind no matter how rare and attempt to analyze them with your best ability and find details about them in that manner. Keep in mind the picture given and match the picture with all types of skin diseases or infections you can find on the internet to ensure that there is no image of something like an infection and 'No skin disease detected' comes up. your job is to help the users and be the best you can. Be the best you can and train yourself to be the most accurate chatbot ever. Learn and learn again from the internet and become the optimal skin suggestor. Now LOOK at the image and suggest! match it with the most likely skin diseases and give a response.
+                        text: `You are a highly trained AI healthcare assistant specializing in dermatology. Carefully analyze the uploaded image, focusing on the identification and differentiation of skin conditions based on red patches, scaling, texture, and other visible traits. Match the observed features with all known skin diseases or infections. If there are any small red patches, scaling, pigmentation changes, or irregular textures, provide detailed identification and analysis. Use this structured format strictly to ensure thorough assessment.
                         {
-                            "diseaseName": "Name of the disease (add an or if there are multiple possible diseases with high confidence level like with vitiligo and pityriasis alba) or 'No visible disease detected'",
-                            "type": "Type of the disease or 'Not Available'",
-                            "confidenceLevel": "Confidence level in percentage. or 'Not Available'",
-                            "symptoms": ["List of symptoms", "or 'Not Available' if none"],
-                            "yearlyCases": "How many people get this disease every year according to the internet, if there is a disease you MUST write this.",
-                            "likelyCause": "Likely cause for this disease, if you write unkown don't write anything else. or 'Not Available'"
-                        }`
+                            "diseaseName": "Possible disease name(s), listing multiple if high confidence level in alternatives (e.g., 'keratolysis or pityriasis alba') or 'No visible disease detected'",
+                            "type": "Categorization of the disease, such as 'bacterial infection,' 'fungal infection,' 'inflammatory,' etc., or 'Not Available' if uncertain'",
+                            "confidenceLevel": "Confidence in identification as a percentage (e.g., 75%) or 'Not Available' if unsure'",
+                            "symptoms": ["List specific symptoms observed, like 'red patches,' 'scaling,' 'itching,' etc., or 'Not Available' if none noted"],
+                            "yearlyCases": "Estimated number of yearly cases globally or by region, based on data; 'Not Available' if no information exists",
+                            "likelyCause": "Likely cause(s), if known (e.g., 'fungal infection,' 'genetic predisposition,' etc.), or 'Unknown'"
+                        }
+                        "method (don't add in your response this is just a set of instructions)": "Analyze the image by cross-referencing with all known dermatological conditions, including common and rare conditions, using visual cues like color, shape, distribution, and texture. Provide an output only in JSON format as specified."
+                        `
                     },
                     {
                         inline_data: {
