@@ -8,11 +8,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Setup event listeners
 function setupEventListeners() {
-    document.getElementById('imageInput').addEventListener('change', handleImageSelection);
-    document.getElementById('uploadForm').addEventListener("submit", async (event) => {
-        event.preventDefault();
-        await initiateScanProcess();
-    });
+    const imageInput = document.getElementById('imageInput');
+    const uploadForm = document.getElementById('uploadForm');
+
+    if (imageInput) {
+        imageInput.addEventListener('change', handleImageSelection);
+    }
+
+    if (uploadForm) {
+        uploadForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            await initiateScanProcess();
+        });
+    }
 }
 
 // Handle image selection and preview
@@ -21,26 +29,28 @@ function handleImageSelection() {
     const filePathInput = document.querySelector(".file-path");
     const scanBtn = document.getElementById("scanBtn");
 
-    if (imageInput.files.length > 0) {
-        const fileName = imageInput.files[0].name;
-        filePathInput.value = fileName;
-        displayImage(imageInput.files[0]);
-        scanBtn.disabled = false;
-    } else {
-        filePathInput.value = '';
-        scanBtn.disabled = true;
+    if (imageInput && filePathInput && scanBtn) {
+        if (imageInput.files.length > 0) {
+            const fileName = imageInput.files[0].name;
+            filePathInput.value = fileName;
+            displayImage(imageInput.files[0]);
+            scanBtn.disabled = false;
+        } else {
+            filePathInput.value = '';
+            scanBtn.disabled = true;
+        }
     }
 }
 
 // Display the selected image in the preview area
 function displayImage(file) {
     const imagePreview = document.getElementById("imagePreview");
-    const reader = new FileReader();
+    if (!imagePreview) return;
 
+    const reader = new FileReader();
     reader.onload = function(event) {
         imagePreview.innerHTML = `<img src="${event.target.result}" alt="Uploaded Image" />`;
     };
-
     reader.readAsDataURL(file);
 }
 
@@ -59,6 +69,8 @@ async function initiateScanProcess() {
     const scanBtn = document.getElementById("scanBtn");
     const resultDiv = document.getElementById("result");
     const imageInput = document.getElementById("imageInput");
+
+    if (!scanBtn || !resultDiv || !imageInput) return;
 
     if (imageInput.files.length === 0) {
         alert("Please upload an image.");
@@ -124,6 +136,8 @@ async function initiateScanProcess() {
 // Display analysis result
 function displayAnalysisResult(data) {
     const resultDiv = document.getElementById("result");
+    if (!resultDiv) return;
+
     resultDiv.innerHTML = '';  // Clear previous results
 
     try {
@@ -163,6 +177,8 @@ function displayAnalysisResult(data) {
 // Display an error message in the UI
 function displayError(message) {
     const resultDiv = document.getElementById("result");
+    if (!resultDiv) return;
+
     resultDiv.innerHTML = `
         <div class="error-card">
             <h5><i class="fas fa-exclamation-triangle"></i> Error</h5>
@@ -173,8 +189,13 @@ function displayError(message) {
 
 // Reset the application for a new scan
 function resetApp() {
-    document.getElementById("uploadForm").reset();
-    document.getElementById("imagePreview").innerHTML = '';
-    document.getElementById("result").innerHTML = '';
-    document.getElementById("scanBtn").disabled = true;
+    const uploadForm = document.getElementById("uploadForm");
+    const imagePreview = document.getElementById("imagePreview");
+    const resultDiv = document.getElementById("result");
+    const scanBtn = document.getElementById("scanBtn");
+
+    if (uploadForm) uploadForm.reset();
+    if (imagePreview) imagePreview.innerHTML = '';
+    if (resultDiv) resultDiv.innerHTML = '';
+    if (scanBtn) scanBtn.disabled = true;
 }
