@@ -57,7 +57,6 @@ async function convertToBase64(file) {
 // Main process to initiate image analysis
 async function initiateScanProcess() {
     const scanBtn = document.getElementById("scanBtn");
-    const newChatBtn = document.getElementById("newChatBtn");
     const progressBar = document.getElementById("progressBar");
     const resultDiv = document.getElementById("result");
     const imageInput = document.getElementById("imageInput");
@@ -71,7 +70,6 @@ async function initiateScanProcess() {
     scanBtn.disabled = true;
     progressBar.style.display = "block";
     resultDiv.innerHTML = "<p>Processing image, please wait...</p>";
-    newChatBtn.style.display = "none";
 
     const file = imageInput.files[0];
     const base64Image = await convertToBase64(file);
@@ -116,8 +114,6 @@ async function initiateScanProcess() {
         if (response.ok) {
             const data = await response.json();
             displayAnalysisResult(data);
-            newChatBtn.style.display = "block";
-            setTimeout(() => newChatBtn.disabled = false, 4000);
         } else {
             const errorData = await response.json();
             console.error("Error response:", errorData);
@@ -187,5 +183,4 @@ function resetApp() {
     document.getElementById("result").innerHTML = '';
     document.getElementById("progressBar").style.display = "none";
     document.getElementById("scanBtn").disabled = true;
-    document.getElementById("newChatBtn").style.display = "none";
 }
