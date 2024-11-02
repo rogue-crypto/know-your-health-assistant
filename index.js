@@ -57,7 +57,6 @@ async function convertToBase64(file) {
 // Main process to initiate image analysis
 async function initiateScanProcess() {
     const scanBtn = document.getElementById("scanBtn");
-    const progressBar = document.getElementById("progressBar");
     const resultDiv = document.getElementById("result");
     const imageInput = document.getElementById("imageInput");
 
@@ -66,9 +65,8 @@ async function initiateScanProcess() {
         return;
     }
 
-    // Show progress and disable button if progressBar exists
+    // Show a processing message and disable the button
     scanBtn.disabled = true;
-    if (progressBar) progressBar.style.display = "block";
     resultDiv.innerHTML = "<p>Processing image, please wait...</p>";
 
     const file = imageInput.files[0];
@@ -109,8 +107,6 @@ async function initiateScanProcess() {
             body: JSON.stringify(payload)
         });
 
-        if (progressBar) progressBar.style.display = "none";
-
         if (response.ok) {
             const data = await response.json();
             displayAnalysisResult(data);
@@ -121,7 +117,6 @@ async function initiateScanProcess() {
         }
     } catch (error) {
         console.error("Fetch error:", error);
-        if (progressBar) progressBar.style.display = "none";
         displayError("Error analyzing the image. Please try again.");
     }
 }
@@ -181,7 +176,5 @@ function resetApp() {
     document.getElementById("uploadForm").reset();
     document.getElementById("imagePreview").innerHTML = '';
     document.getElementById("result").innerHTML = '';
-    const progressBar = document.getElementById("progressBar");
-    if (progressBar) progressBar.style.display = "none";
     document.getElementById("scanBtn").disabled = true;
 }
