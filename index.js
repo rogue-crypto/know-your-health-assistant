@@ -1,12 +1,16 @@
 const apiKey = 'AIzaSyBgIXy5opjM6qz97W64XU9Nn3mFenX2hsg';
 
-// Event listeners for the image selection and form submission
 document.addEventListener("DOMContentLoaded", () => {
-    setupEventListeners();
-    resetApp();
+    initializeApp();
 });
 
-// Setup event listeners
+// Initialize the app
+function initializeApp() {
+    setupEventListeners();
+    resetApp();
+}
+
+// Setup event listeners for image input and form submission
 function setupEventListeners() {
     const imageInput = document.getElementById('imageInput');
     const uploadForm = document.getElementById('uploadForm');
@@ -23,7 +27,7 @@ function setupEventListeners() {
     }
 }
 
-// Handle image selection and preview
+// Handle image selection and show preview
 function handleImageSelection() {
     const imageInput = document.getElementById("imageInput");
     const filePathInput = document.querySelector(".file-path");
@@ -42,7 +46,7 @@ function handleImageSelection() {
     }
 }
 
-// Display the selected image in the preview area
+// Display selected image preview
 function displayImage(file) {
     const imagePreview = document.getElementById("imagePreview");
     if (!imagePreview) return;
@@ -64,20 +68,17 @@ async function convertToBase64(file) {
     });
 }
 
-// Main process to initiate image analysis
+// Main process to send image for analysis
 async function initiateScanProcess() {
     const scanBtn = document.getElementById("scanBtn");
     const resultDiv = document.getElementById("result");
     const imageInput = document.getElementById("imageInput");
 
-    if (!scanBtn || !resultDiv || !imageInput) return;
-
-    if (imageInput.files.length === 0) {
+    if (!scanBtn || !resultDiv || !imageInput || imageInput.files.length === 0) {
         alert("Please upload an image.");
         return;
     }
 
-    // Show a processing message and disable the button
     scanBtn.disabled = true;
     resultDiv.innerHTML = "<p>Processing image, please wait...</p>";
 
@@ -89,17 +90,15 @@ async function initiateScanProcess() {
             {
                 parts: [
                     {
-                        text: `You are a highly trained AI healthcare assistant specializing in dermatology. Carefully analyze the uploaded image, focusing on the identification and differentiation of skin conditions based on red patches, scaling, texture, and other visible traits. Match the observed features with all known skin diseases or infections. If there are any small red patches, scaling, pigmentation changes, or irregular textures, provide detailed identification and analysis. Use this structured format strictly to ensure thorough assessment.
+                        text: `You are an AI healthcare assistant specializing in dermatology. Analyze the uploaded image and return a response in JSON format only with fields:
                         {
-                            "diseaseName": "Possible disease name(s), listing multiple if high confidence level in alternatives (e.g., 'keratolysis or pityriasis alba') or 'No visible disease detected'",
-                            "type": "Categorization of the disease, such as 'bacterial infection,' 'fungal infection,' 'inflammatory,' etc., or 'Not Available' if uncertain'",
-                            "confidenceLevel": "Confidence in identification as a percentage (e.g., 75%) or 'Not Available' if unsure'",
-                            "symptoms": ["List specific symptoms observed, like 'red patches,' 'scaling,' 'itching,' etc., or 'Not Available' if none noted"],
-                            "yearlyCases": "Estimated number of yearly cases globally or by region, based on data; 'Not Available' if no information exists",
-                            "likelyCause": "Likely cause(s), if known (e.g., 'fungal infection,' 'genetic predisposition,' etc.), or 'Unknown'"
-                        }
-                        "method (don't add in your response this is just a set of instructions)": "Analyze the image by cross-referencing with all known dermatological conditions, including common and rare conditions, using visual cues like color, shape, distribution, and texture. Provide an output only in JSON format as specified."
-                        `
+                            "diseaseName": "Detected disease name",
+                            "type": "Disease categorization (e.g., 'bacterial infection')",
+                            "confidenceLevel": "Confidence level as a percentage",
+                            "symptoms": ["List of observed symptoms"],
+                            "yearlyCases": "Estimated yearly cases",
+                            "likelyCause": "Probable cause"
+                        }`
                     },
                     {
                         inline_data: {
@@ -140,12 +139,8 @@ function displayAnalysisResult(data) {
     const resultDiv = document.getElementById("result");
     if (!resultDiv) return;
 
-    resultDiv.innerHTML = '';  // Clear previous results
-
     try {
         const responseText = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
-
-        // Ensure we have valid JSON only (try-catch for extra safety)
         const analysis = JSON.parse(responseText);
 
         const diseaseInfo = {
@@ -155,7 +150,7 @@ function displayAnalysisResult(data) {
             symptoms: Array.isArray(analysis.symptoms) && analysis.symptoms.length > 0 
                 ? analysis.symptoms.join(", ") 
                 : "Not Available",
-            annualCases: analysis.yearlyCases || "Unkown",
+            annualCases: analysis.yearlyCases || "Unknown",
             cause: analysis.likelyCause || "Not Available"
         };
 
@@ -176,7 +171,7 @@ function displayAnalysisResult(data) {
     }
 }
 
-// Display an error message in the UI
+// Display error message
 function displayError(message) {
     const resultDiv = document.getElementById("result");
     if (!resultDiv) return;
