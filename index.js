@@ -1,5 +1,4 @@
 const apiKey = 'AIzaSyBgIXy5opjM6qz97W64XU9Nn3mFenX2hsg';
-
 document.addEventListener("DOMContentLoaded", () => {
     initializeApp();
 });
@@ -90,15 +89,7 @@ async function initiateScanProcess() {
             {
                 parts: [
                     {
-                        text: `You are an AI healthcare assistant specializing in dermatology. Analyze the uploaded image and return a response in JSON format only with fields:
-                        {
-                            "diseaseName": "Detected disease name",
-                            "type": "Disease categorization (e.g., 'bacterial infection')",
-                            "confidenceLevel": "Confidence level as a percentage",
-                            "symptoms": ["List of observed symptoms"],
-                            "yearlyCases": "Estimated yearly cases",
-                            "likelyCause": "Probable cause"
-                        }`
+                        text: "Analyze the uploaded dermatology image and return a JSON response with fields: diseaseName, type, confidenceLevel, symptoms, yearlyCases, likelyCause."
                     },
                     {
                         inline_data: {
@@ -141,7 +132,14 @@ function displayAnalysisResult(data) {
 
     try {
         const responseText = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
-        const analysis = JSON.parse(responseText);
+
+        // Attempt to parse the responseText as JSON
+        let analysis;
+        try {
+            analysis = JSON.parse(responseText);
+        } catch (error) {
+            throw new Error("Invalid JSON format in the API response.");
+        }
 
         const diseaseInfo = {
             name: analysis.diseaseName || "No Disease Detected",
@@ -196,3 +194,4 @@ function resetApp() {
     if (resultDiv) resultDiv.innerHTML = '';
     if (scanBtn) scanBtn.disabled = true;
 }
+
