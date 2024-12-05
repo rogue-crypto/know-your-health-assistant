@@ -61,7 +61,10 @@ async function convertToBase64(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onloadend = () => resolve(reader.result.split(",")[1]);
-        reader.onerror = reject;
+        reader.onerror = (error) => {
+            console.error("Error converting image to Base64:", error);
+            reject(error);
+        };
         reader.readAsDataURL(file);
     });
 }
@@ -81,7 +84,16 @@ async function initiateScanProcess() {
     resultDiv.innerHTML = "<p>Processing image, please wait...</p>";
 
     const file = imageInput.files[0];
-    const base64Image = await convertToBase64(file);
+    let base64Image;
+
+    try {
+        base64Image = await convertToBase64(file);
+    } catch (error) {
+        displayError("Failed to process the image. Please try again.");
+        console.error("Base64 Conversion Error:", error);
+        scanBtn.disabled = false;
+        return;
+    }
 
     const payload = {
         contents: [
@@ -115,9 +127,11 @@ async function initiateScanProcess() {
             displayAnalysisResult(data);
         } else {
             const errorData = await response.json();
+            console.error("API Response Error:", errorData);
             displayError(`Error: ${errorData.error.message}`);
         }
     } catch (error) {
+        console.error("Network or API Request Error:", error);
         displayError("An error occurred while processing the image. Please try again.");
     } finally {
         scanBtn.disabled = false;
@@ -154,6 +168,7 @@ function displayAnalysisResult(data) {
             </div>
         `;
     } catch (error) {
+        console.error("Error Parsing Analysis Result:", error);
         displayError("Error processing AI response. Please try again.");
     }
 }
