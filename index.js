@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initializeApp();
 });
 
-// Initialize the app
+// Initialize the application
 function initializeApp() {
     setupEventListeners();
     resetApp();
@@ -27,38 +27,36 @@ function setupEventListeners() {
     }
 }
 
-// Handle image selection and show preview
+// Handle image selection and display preview
 function handleImageSelection() {
     const imageInput = document.getElementById("imageInput");
     const filePathInput = document.querySelector(".file-path");
     const scanBtn = document.getElementById("scanBtn");
 
-    if (imageInput && filePathInput && scanBtn) {
-        if (imageInput.files.length > 0) {
-            const fileName = imageInput.files[0].name;
-            filePathInput.value = fileName;
-            displayImage(imageInput.files[0]);
-            scanBtn.disabled = false;
-        } else {
-            filePathInput.value = '';
-            scanBtn.disabled = true;
-        }
+    if (imageInput?.files.length > 0) {
+        const fileName = imageInput.files[0].name;
+        filePathInput.value = fileName;
+        displayImage(imageInput.files[0]);
+        scanBtn.disabled = false;
+    } else {
+        filePathInput.value = '';
+        scanBtn.disabled = true;
     }
 }
 
-// Display selected image preview
+// Display the selected image preview
 function displayImage(file) {
     const imagePreview = document.getElementById("imagePreview");
     if (!imagePreview) return;
 
     const reader = new FileReader();
-    reader.onload = function(event) {
+    reader.onload = (event) => {
         imagePreview.innerHTML = `<img src="${event.target.result}" alt="Uploaded Image" />`;
     };
     reader.readAsDataURL(file);
 }
 
-// Convert image file to Base64
+// Convert the image file to Base64
 async function convertToBase64(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -68,13 +66,13 @@ async function convertToBase64(file) {
     });
 }
 
-// Main process to send image for analysis
+// Main process: send the image for analysis
 async function initiateScanProcess() {
     const scanBtn = document.getElementById("scanBtn");
     const resultDiv = document.getElementById("result");
     const imageInput = document.getElementById("imageInput");
 
-    if (!scanBtn || !resultDiv || !imageInput || imageInput.files.length === 0) {
+    if (!imageInput?.files.length) {
         alert("Please upload an image.");
         return;
     }
@@ -90,15 +88,7 @@ async function initiateScanProcess() {
             {
                 parts: [
                     {
-                        text: `You are an AI healthcare assistant specializing in dermatology. Analyze the uploaded image and return a response in JSON format only with fields:
-                        {
-                            "diseaseName": "Detected disease name",
-                            "type": "Disease categorization (e.g., 'bacterial infection')",
-                            "confidenceLevel": "Confidence level as a percentage",
-                            "symptoms": ["List of observed symptoms"],
-                            "yearlyCases": "Estimated yearly cases",
-                            "likelyCause": "Probable cause"
-                        }`
+                        text: "You are an AI healthcare assistant specializing in dermatology. Analyze the uploaded image and return a response in JSON format with the fields: {\"diseaseName\":\"Detected disease name\",\"type\":\"Disease categorization\",\"confidenceLevel\":\"Confidence level (%)\",\"symptoms\":[\"Symptom list\"],\"yearlyCases\":\"Estimated yearly cases\",\"likelyCause\":\"Probable cause\"}"
                     },
                     {
                         inline_data: {
@@ -125,16 +115,16 @@ async function initiateScanProcess() {
             displayAnalysisResult(data);
         } else {
             const errorData = await response.json();
-            console.error("Error response:", errorData);
             displayError(`Error: ${errorData.error.message}`);
         }
     } catch (error) {
-        console.error("Fetch error:", error);
-        displayError("Error analyzing the image. Please try again.");
+        displayError("An error occurred while processing the image. Please try again.");
+    } finally {
+        scanBtn.disabled = false;
     }
 }
 
-// Display analysis result
+// Display analysis results
 function displayAnalysisResult(data) {
     const resultDiv = document.getElementById("result");
     if (!resultDiv) return;
@@ -147,10 +137,8 @@ function displayAnalysisResult(data) {
             name: analysis.diseaseName || "No Disease Detected",
             type: analysis.type || "Not Available",
             confidenceLevel: analysis.confidenceLevel || "Not Available",
-            symptoms: Array.isArray(analysis.symptoms) && analysis.symptoms.length > 0 
-                ? analysis.symptoms.join(", ") 
-                : "Not Available",
-            annualCases: analysis.yearlyCases || "Unknown",
+            symptoms: analysis.symptoms?.join(", ") || "Not Available",
+            yearlyCases: analysis.yearlyCases || "Unknown",
             cause: analysis.likelyCause || "Not Available"
         };
 
@@ -161,17 +149,16 @@ function displayAnalysisResult(data) {
                 <p><strong>Type:</strong> ${diseaseInfo.type}</p>
                 <p><strong>Confidence Level:</strong> ${diseaseInfo.confidenceLevel}</p>
                 <p><strong>Symptoms:</strong> ${diseaseInfo.symptoms}</p>
-                <p><strong>Yearly Cases:</strong> ${diseaseInfo.annualCases}</p>
+                <p><strong>Yearly Cases:</strong> ${diseaseInfo.yearlyCases}</p>
                 <p><strong>Likely Cause:</strong> ${diseaseInfo.cause}</p>
             </div>
         `;
     } catch (error) {
-        console.error("Parsing error:", error);
-        displayError("There was an error processing the AI response format. Please try again.");
+        displayError("Error processing AI response. Please try again.");
     }
 }
 
-// Display error message
+// Display error messages
 function displayError(message) {
     const resultDiv = document.getElementById("result");
     if (!resultDiv) return;
@@ -184,14 +171,14 @@ function displayError(message) {
     `;
 }
 
-// Reset the application for a new scan
+// Reset the application
 function resetApp() {
     const uploadForm = document.getElementById("uploadForm");
     const imagePreview = document.getElementById("imagePreview");
     const resultDiv = document.getElementById("result");
     const scanBtn = document.getElementById("scanBtn");
 
-    if (uploadForm) uploadForm.reset();
+    uploadForm?.reset();
     if (imagePreview) imagePreview.innerHTML = '';
     if (resultDiv) resultDiv.innerHTML = '';
     if (scanBtn) scanBtn.disabled = true;
