@@ -1,4 +1,4 @@
-const apiKey = 'AIzaSyBgIXy5opjM6qz97W64XU9Nn3mFenX2hsg';
+const apiKey = 'AIzaSyB2rYYcVdfLcoN3Gwc-dd96YY4R5Gj1dqs';
 
 document.addEventListener("DOMContentLoaded", () => {
     initializeApp();
