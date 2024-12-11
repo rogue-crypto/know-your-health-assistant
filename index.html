@@ -3,40 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Know Your Health Assistant</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Health Image Analyzer</title>
+    <link rel="stylesheet" href="styles.css">
+    <script defer src="app.js"></script>
 </head>
 <body>
-    <header class="header">
-        <h1>Know Your Health Assistant <i class="fas fa-stethoscope"></i></h1>
-    </header>
-    <main class="main-content">
-        <section class="card">
-            <form id="uploadForm" class="upload-form"> 
-                <div class="file-upload">
-                    <label for="imageInput" class="upload-label">
-                         Choose an Image
-                        <input type="file" id="imageInput" accept="image/*" hidden />
-                    </label>
-                    <input type="text" class="file-path" placeholder="No file selected" readonly />
+    <div class="container">
+        <header>
+            <h1>Know Your Health</h1>
+        </header>
+        <main>
+            <form id="uploadForm">
+                <div class="file-input">
+                    <input type="file" id="imageInput" accept="image/*" hidden>
+                    <label for="imageInput" class="btn">Upload Image</label>
+                    <input type="text" class="file-path" placeholder="No file chosen" readonly>
                 </div>
-                <button type="submit" id="scanBtn" class="scan-btn" disabled><i class="fas fa-search"></i> Scan</button>
+                <div id="imagePreview" class="image-preview"></div>
+                <button type="submit" id="scanBtn" class="btn" disabled>Analyze Image</button>
             </form>
-            <div id="imagePreview" class="image-preview"></div>
-        </section>
-
-        <div id="progressBar" class="progress-bar" style="display: none;">
-            <div class="progress-indeterminate"></div>
-        </div>
-
-        <section id="result" class="result-container"></section>
-    </main>
-    
-    <footer class="footer">
-        <p>&copy; 2024 Know Your Health Assistant</p>
-    </footer>
-    
-    <script type="module" src="index.js"></script>
+            <div id="result" class="result"></div>
+        </main>
+    </div>
 </body>
 </html>
