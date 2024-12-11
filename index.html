@@ -8,22 +8,32 @@
     <script defer src="app.js"></script>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Know Your Health</h1>
-        </header>
-        <main>
+    <div class="parallax-container">
+        <section class="parallax">
+            <header class="swoop-in">
+                <h1>Know Your Health</h1>
+                <p>Analyze your health with just an image upload. Get accurate predictions instantly.</p>
+            </header>
+        </section>
+    </div>
+
+    <div class="content-container">
+        <section class="form-section swoop-in-delay-1">
             <form id="uploadForm">
+                <h2>Upload an Image</h2>
+                <p>Start by uploading an image for analysis. Ensure it's clear and relevant.</p>
                 <div class="file-input">
                     <input type="file" id="imageInput" accept="image/*" hidden>
-                    <label for="imageInput" class="btn">Upload Image</label>
+                    <label for="imageInput" class="btn">Choose File</label>
                     <input type="text" class="file-path" placeholder="No file chosen" readonly>
                 </div>
-                <div id="imagePreview" class="image-preview"></div>
                 <button type="submit" id="scanBtn" class="btn" disabled>Analyze Image</button>
             </form>
-            <div id="result" class="result"></div>
-        </main>
+        </section>
+
+        <section id="result" class="result swoop-in-delay-2">
+            <!-- Results will appear here -->
+        </section>
     </div>
 </body>
 </html>
