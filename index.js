@@ -51,7 +51,7 @@ function displayImage(file) {
 
     const reader = new FileReader();
     reader.onload = (event) => {
-        imagePreview.innerHTML = `<img src="${event.target.result}" alt="Uploaded Image" />`;
+        imagePreview.innerHTML = `<img src="${event.target.result}" alt="Uploaded Image" class="preview-image" />`;
     };
     reader.readAsDataURL(file);
 }
@@ -81,7 +81,7 @@ async function initiateScanProcess() {
     }
 
     scanBtn.disabled = true;
-    resultDiv.innerHTML = "<p>Processing image, please wait...</p>";
+    resultDiv.innerHTML = "<p class='loading'>Processing image, please wait...</p>";
 
     const file = imageInput.files[0];
     let base64Image;
@@ -128,7 +128,7 @@ async function initiateScanProcess() {
         } else {
             const errorData = await response.json();
             console.error("API Response Error:", errorData);
-            displayError(`Error: ${errorData.error.message}`);
+            displayError(`Error: ${errorData.error?.message || "Unknown error occurred."}`);
         }
     } catch (error) {
         console.error("Network or API Request Error:", error);
@@ -144,7 +144,7 @@ function displayAnalysisResult(data) {
     if (!resultDiv) return;
 
     try {
-        const responseText = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+        const responseText = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '{}';
         const analysis = JSON.parse(responseText);
 
         const diseaseInfo = {
