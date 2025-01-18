@@ -1,4 +1,4 @@
-const apiKey = 'AIzaSyBgIXy5opjM6qz97W64XU9Nn3mFenX2hsg';
+const apiKey = 'AIzaSyBfy_-LAk60mOHJBJnV2W2kzJmO7BlTCuE';
 
 // Event listeners for the image selection and form submission
 document.addEventListener("DOMContentLoaded", () => {
