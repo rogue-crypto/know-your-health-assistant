@@ -3,40 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Know Your Health Assistant</title>
+    <title>Health Assistant Pro</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <header class="header">
-        <h1>Know Your Health Assistant <i class="fas fa-stethoscope"></i></h1>
+        <h1><i class="fas fa-heartbeat"></i> Health Assistant Pro</h1>
+        <p class="subtitle">AI-Powered Medical Image Analysis</p>
     </header>
+    
     <main class="main-content">
-        <section class="card">
-            <form id="uploadForm" class="upload-form"> 
+        <section class="upload-card">
+            <div class="instructions">
+                <h2><i class="fas fa-info-circle"></i> How It Works</h2>
+                <ol>
+                    <li>Upload a clear image of the affected area</li>
+                    <li>Wait for AI analysis</li>
+                    <li>Review the detailed assessment</li>
+                </ol>
+            </div>
+            
+            <form id="uploadForm" class="upload-form">
                 <div class="file-upload">
                     <label for="imageInput" class="upload-label">
-                         Choose an Image
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <span>Choose Image</span>
                         <input type="file" id="imageInput" accept="image/*" hidden />
                     </label>
                     <input type="text" class="file-path" placeholder="No file selected" readonly />
                 </div>
-                <button type="submit" id="scanBtn" class="scan-btn" disabled><i class="fas fa-search"></i> Scan</button>
+                
+                <div id="imagePreview" class="image-preview"></div>
+                
+                <button type="submit" id="scanBtn" class="scan-btn" disabled>
+                    <i class="fas fa-microscope"></i> Analyze Image
+                </button>
             </form>
-            <div id="imagePreview" class="image-preview"></div>
         </section>
 
-        <div id="progressBar" class="progress-bar" style="display: none;">
-            <div class="progress-indeterminate"></div>
+        <div id="loadingOverlay" class="loading-overlay">
+            <div class="spinner"></div>
+            <p>Analyzing image...</p>
         </div>
 
         <section id="result" class="result-container"></section>
     </main>
     
     <footer class="footer">
-        <p>&copy; 2024 Know Your Health Assistant</p>
+        <p>© 2024 Health Assistant Pro | For Educational Purposes Only</p>
+        <p class="disclaimer">This tool is not a substitute for professional medical advice</p>
     </footer>
     
-    <script type="module" src="index.js"></script>
+    <script src="index.js"></script>
 </body>
 </html>
