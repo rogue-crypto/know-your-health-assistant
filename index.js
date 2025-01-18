@@ -1,12 +1,12 @@
-const apiKey = 'AIzaSyBfy_-LAk60mOHJBJnV2W2kzJmO7BlTCuE';
+// API configuration
+const API_KEY = 'AIzaSyBCy_XXLemCxYoaQgaz_YaneyHXWCJgk8k';
+const API_ENDPOINT = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-vision-latest:generateContent';
 
-// Event listeners for the image selection and form submission
 document.addEventListener("DOMContentLoaded", () => {
     setupEventListeners();
     resetApp();
 });
 
-// Setup event listeners
 function setupEventListeners() {
     const imageInput = document.getElementById('imageInput');
     const uploadForm = document.getElementById('uploadForm');
@@ -23,7 +23,6 @@ function setupEventListeners() {
     }
 }
 
-// Handle image selection and preview
 function handleImageSelection() {
     const imageInput = document.getElementById("imageInput");
     const filePathInput = document.querySelector(".file-path");
@@ -42,19 +41,17 @@ function handleImageSelection() {
     }
 }
 
-// Display the selected image in the preview area
 function displayImage(file) {
     const imagePreview = document.getElementById("imagePreview");
     if (!imagePreview) return;
 
     const reader = new FileReader();
     reader.onload = function(event) {
-        imagePreview.innerHTML = `<img src="${event.target.result}" alt="Uploaded Image" />`;
+        imagePreview.innerHTML = `<img src="${event.target.result}" alt="Uploaded Image" class="preview-image" />`;
     };
     reader.readAsDataURL(file);
 }
 
-// Convert image file to Base64
 async function convertToBase64(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -64,98 +61,90 @@ async function convertToBase64(file) {
     });
 }
 
-// Main process to initiate image analysis
 async function initiateScanProcess() {
     const scanBtn = document.getElementById("scanBtn");
     const resultDiv = document.getElementById("result");
     const imageInput = document.getElementById("imageInput");
 
-    if (!scanBtn || !resultDiv || !imageInput) return;
-
-    if (imageInput.files.length === 0) {
+    if (!imageInput.files.length) {
         alert("Please upload an image.");
         return;
     }
 
-    // Show a processing message and disable the button
     scanBtn.disabled = true;
     resultDiv.innerHTML = "<p>Processing image, please wait...</p>";
 
-    const file = imageInput.files[0];
-    const base64Image = await convertToBase64(file);
-
-    const payload = {
-        contents: [
-            {
-                parts: [
-                    {
-                        text: `You are a highly trained AI healthcare assistant specializing in dermatology. Carefully analyze the uploaded image, focusing on the identification and differentiation of skin conditions based on red patches, scaling, texture, and other visible traits. Match the observed features with all known skin diseases or infections. If there are any small red patches, scaling, pigmentation changes, or irregular textures, provide detailed identification and analysis. Use this structured format strictly to ensure thorough assessment.
-                        {
-                            "diseaseName": "Possible disease name(s), listing multiple if high confidence level in alternatives (e.g., 'keratolysis or pityriasis alba') or 'No visible disease detected'",
-                            "type": "Categorization of the disease, such as 'bacterial infection,' 'fungal infection,' 'inflammatory,' etc., or 'Not Available' if uncertain'",
-                            "confidenceLevel": "Confidence in identification as a percentage (e.g., 75%) or 'Not Available' if unsure'",
-                            "symptoms": ["List specific symptoms observed, like 'red patches,' 'scaling,' 'itching,' etc., or 'Not Available' if none noted"],
-                            "yearlyCases": "Estimated number of yearly cases globally or by region, based on data; 'Not Available' if no information exists",
-                            "likelyCause": "Likely cause(s), if known (e.g., 'fungal infection,' 'genetic predisposition,' etc.), or 'Unknown'"
-                        }
-                        "method (don't add in your response this is just a set of instructions)": "Analyze the image by cross-referencing with all known dermatological conditions, including common and rare conditions, using visual cues like color, shape, distribution, and texture. Provide an output only in JSON format as specified."
-                        `
-                    },
-                    {
-                        inline_data: {
-                            mime_type: "image/png",
-                            data: base64Image
-                        }
-                    }
-                ]
-            }
-        ]
-    };
-
     try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
-            method: "POST",
+        const base64Image = await convertToBase64(imageInput.files[0]);
+        
+        const payload = {
+            contents: [{
+                parts: [{
+                    text: `Analyze this image for skin conditions and provide a detailed assessment in this exact JSON format:
+                    {
+                        "diseaseName": "Name of the condition or 'No visible disease detected'",
+                        "type": "Disease classification or 'Not Available'",
+                        "confidenceLevel": "Confidence as percentage or 'Not Available'",
+                        "symptoms": ["Observed symptoms"],
+                        "yearlyCases": "Estimated cases or 'Not Available'",
+                        "likelyCause": "Known causes or 'Unknown'"
+                    }`
+                }, {
+                    inline_data: {
+                        mime_type: imageInput.files[0].type,
+                        data: base64Image
+                    }
+                }]
+            }]
+        };
+
+        const response = await fetch(`${API_ENDPOINT}?key=${API_KEY}`, {
+            method: 'POST',
             headers: {
-                "Content-Type": "application/json"
+                'Content-Type': 'application/json',
             },
             body: JSON.stringify(payload)
         });
 
-        if (response.ok) {
-            const data = await response.json();
-            displayAnalysisResult(data);
-        } else {
-            const errorData = await response.json();
-            console.error("Error response:", errorData);
-            displayError(`Error: ${errorData.error.message}`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
+
+        const data = await response.json();
+        displayAnalysisResult(data);
+
     } catch (error) {
-        console.error("Fetch error:", error);
+        console.error("Analysis error:", error);
         displayError("Error analyzing the image. Please try again.");
+    } finally {
+        scanBtn.disabled = false;
     }
 }
 
-// Display analysis result
 function displayAnalysisResult(data) {
     const resultDiv = document.getElementById("result");
     if (!resultDiv) return;
 
-    resultDiv.innerHTML = '';  // Clear previous results
-
     try {
-        const responseText = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+        const responseText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!responseText) {
+            throw new Error("Invalid response format");
+        }
 
-        // Ensure we have valid JSON only (try-catch for extra safety)
-        const analysis = JSON.parse(responseText);
+        // Find the JSON object in the response text
+        const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) {
+            throw new Error("No JSON found in response");
+        }
+
+        const analysis = JSON.parse(jsonMatch[0]);
 
         const diseaseInfo = {
             name: analysis.diseaseName || "No Disease Detected",
             type: analysis.type || "Not Available",
             confidenceLevel: analysis.confidenceLevel || "Not Available",
-            symptoms: Array.isArray(analysis.symptoms) && analysis.symptoms.length > 0 
-                ? analysis.symptoms.join(", ") 
-                : "Not Available",
-            annualCases: analysis.yearlyCases || "Unkown",
+            symptoms: Array.isArray(analysis.symptoms) ? analysis.symptoms.join(", ") : "Not Available",
+            annualCases: analysis.yearlyCases || "Unknown",
             cause: analysis.likelyCause || "Not Available"
         };
 
@@ -172,11 +161,10 @@ function displayAnalysisResult(data) {
         `;
     } catch (error) {
         console.error("Parsing error:", error);
-        displayError("There was an error processing the AI response format. Please try again.");
+        displayError("Error processing the AI response. Please try again.");
     }
 }
 
-// Display an error message in the UI
 function displayError(message) {
     const resultDiv = document.getElementById("result");
     if (!resultDiv) return;
@@ -189,7 +177,6 @@ function displayError(message) {
     `;
 }
 
-// Reset the application for a new scan
 function resetApp() {
     const uploadForm = document.getElementById("uploadForm");
     const imagePreview = document.getElementById("imagePreview");
