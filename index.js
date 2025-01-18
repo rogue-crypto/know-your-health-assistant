@@ -1,6 +1,6 @@
 // API Configuration
-const API_KEY = 'YOUR_API_KEY'; // Replace with your actual API key
-const API_ENDPOINT = 'https://generativelanguage.googleapis.com/v2/models/gemini-pro-vision:generateContent';
+const API_KEY = 'AIzaSyBCy_XXLemCxYoaQgaz_YaneyHXWCJgk8k'; // Replace with your actual API key
+const API_ENDPOINT = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro-vision:generateContent';
 
 // DOM Elements
 const elements = {
@@ -65,7 +65,7 @@ async function handleFormSubmission(event) {
         displayResults(result);
     } catch (error) {
         console.error('Analysis error:', error);
-        showError('Failed to analyze image. Please try again.');
+        showError('Failed to analyze image. Please make sure your API key is valid and try again.');
     } finally {
         showLoading(false);
     }
@@ -74,48 +74,36 @@ async function handleFormSubmission(event) {
 async function analyzeImage(file) {
     const base64Image = await convertToBase64(file);
     
+    // New Gemini API payload structure
     const payload = {
-        contents: [{
-            parts: [{
-                text: `Please analyze this medical image and provide a detailed assessment in the following JSON format:
-                {
-                    "condition": {
-                        "name": "Name of the identified condition or 'No significant findings'",
-                        "confidence": "Confidence level as percentage",
-                        "severity": "Mild/Moderate/Severe or 'Not applicable'"
+        contents: [
+            {
+                parts: [
+                    {
+                        text: "Analyze this medical image and provide a detailed assessment. Include condition name, confidence level, symptoms observed, and recommendations."
                     },
-                    "observations": {
-                        "primarySymptoms": ["List of visible symptoms"],
-                        "characteristics": ["Notable characteristics observed"],
-                        "recommendations": ["General recommendations"]
-                    },
-                    "additionalInfo": {
-                        "commonCauses": ["Common causes"],
-                        "riskFactors": ["Known risk factors"],
-                        "preventiveMeasures": ["Preventive measures"]
+                    {
+                        inlineData: {
+                            mimeType: file.type,
+                            data: base64Image
+                        }
                     }
-                }`
-            }, {
-                inline_data: {
-                    mime_type: file.type,
-                    data: base64Image
-                }
-            }]
-        }],
-        safety_settings: {
-            category: "HARM_CATEGORY_DANGEROUS_CONTENT",
-            threshold: "BLOCK_MEDIUM_AND_ABOVE"
-        }
+                ]
+            }
+        ]
     };
 
     const response = await fetch(`${API_ENDPOINT}?key=${API_KEY}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+            'Content-Type': 'application/json',
+        },
         body: JSON.stringify(payload)
     });
 
     if (!response.ok) {
-        throw new Error(`API Error: ${response.status}`);
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(`API Error: ${response.status} - ${errorData.error?.message || 'Unknown error'}`);
     }
 
     return await response.json();
@@ -123,50 +111,20 @@ async function analyzeImage(file) {
 
 function displayResults(data) {
     try {
-        const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (!responseText) throw new Error('Invalid response format');
+        const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!text) {
+            throw new Error('Invalid response format');
+        }
 
-        const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-        if (!jsonMatch) throw new Error('No JSON found in response');
-
-        const analysis = JSON.parse(jsonMatch[0]);
-        
         elements.resultContainer.innerHTML = `
             <div class="result-card">
-                <div class="result-header ${getHeaderClass(analysis.condition.severity)}">
+                <div class="result-header">
                     <h3><i class="fas fa-clipboard-check"></i> Analysis Results</h3>
-                    <span class="confidence-badge">${analysis.condition.confidence}</span>
                 </div>
                 
                 <div class="result-body">
                     <div class="result-section">
-                        <h4><i class="fas fa-stethoscope"></i> Condition</h4>
-                        <p class="condition-name">${analysis.condition.name}</p>
-                        <p class="severity-label">Severity: ${analysis.condition.severity}</p>
-                    </div>
-
-                    <div class="result-section">
-                        <h4><i class="fas fa-list-ul"></i> Key Observations</h4>
-                        <ul>
-                            ${analysis.observations.primarySymptoms.map(symptom => 
-                                `<li>${symptom}</li>`).join('')}
-                        </ul>
-                    </div>
-
-                    <div class="result-section">
-                        <h4><i class="fas fa-comment-medical"></i> Recommendations</h4>
-                        <ul>
-                            ${analysis.observations.recommendations.map(rec => 
-                                `<li>${rec}</li>`).join('')}
-                        </ul>
-                    </div>
-
-                    <div class="result-section">
-                        <h4><i class="fas fa-shield-alt"></i> Prevention</h4>
-                        <ul>
-                            ${analysis.additionalInfo.preventiveMeasures.map(measure => 
-                                `<li>${measure}</li>`).join('')}
-                        </ul>
+                        ${formatAnalysisText(text)}
                     </div>
                 </div>
 
@@ -184,14 +142,12 @@ function displayResults(data) {
     }
 }
 
-function getHeaderClass(severity) {
-    const severityMap = {
-        'Mild': 'severity-mild',
-        'Moderate': 'severity-moderate',
-        'Severe': 'severity-severe',
-        'Not applicable': 'severity-none'
-    };
-    return severityMap[severity] || 'severity-none';
+function formatAnalysisText(text) {
+    // Split the text into paragraphs and format them
+    return text.split('\n')
+        .filter(line => line.trim())
+        .map(line => `<p>${line}</p>`)
+        .join('');
 }
 
 async function convertToBase64(file) {
@@ -204,23 +160,29 @@ async function convertToBase64(file) {
 }
 
 function showLoading(show) {
-    elements.loadingOverlay.style.display = show ? 'flex' : 'none';
-    elements.scanButton.disabled = show;
+    if (elements.loadingOverlay) {
+        elements.loadingOverlay.style.display = show ? 'flex' : 'none';
+    }
+    if (elements.scanButton) {
+        elements.scanButton.disabled = show;
+    }
 }
 
 function showError(message) {
-    elements.resultContainer.innerHTML = `
-        <div class="error-card">
-            <i class="fas fa-exclamation-circle"></i>
-            <p>${message}</p>
-        </div>
-    `;
+    if (elements.resultContainer) {
+        elements.resultContainer.innerHTML = `
+            <div class="error-card">
+                <i class="fas fa-exclamation-circle"></i>
+                <p>${message}</p>
+            </div>
+        `;
+    }
 }
 
 function resetUI() {
-    elements.form.reset();
-    elements.filePathDisplay.value = '';
-    elements.imagePreview.innerHTML = '';
-    elements.resultContainer.innerHTML = '';
-    elements.scanButton.disabled = true;
+    if (elements.form) elements.form.reset();
+    if (elements.filePathDisplay) elements.filePathDisplay.value = '';
+    if (elements.imagePreview) elements.imagePreview.innerHTML = '';
+    if (elements.resultContainer) elements.resultContainer.innerHTML = '';
+    if (elements.scanButton) elements.scanButton.disabled = true;
 }
