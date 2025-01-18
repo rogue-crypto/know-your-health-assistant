@@ -3,229 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Health Image Analyzer</title>
-    <link rel="stylesheet" href="styles.css">
-    <script defer src="app.js"></script>
+    <title>Know Your Health Assistant</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-    <div class="parallax-container">
-        <section class="parallax">
-            <header class="swoop-in">
-                <h1>Know Your Health</h1>
-                <p>Analyze your health with just an image upload. Get accurate predictions instantly.</p>
-            </header>
-        </section>
-    </div>
-
-    <div class="content-container">
-        <section class="form-section swoop-in-delay-1">
-            <form id="uploadForm">
-                <h2>Upload an Image</h2>
-                <p>Start by uploading an image for analysis. Ensure it's clear and relevant.</p>
-                <div class="file-input">
-                    <input type="file" id="imageInput" accept="image/*" hidden>
-                    <label for="imageInput" class="btn">Choose File</label>
-                    <input type="text" class="file-path" placeholder="No file chosen" readonly>
+    <header class="header">
+        <h1>Know Your Health Assistant <i class="fas fa-stethoscope"></i></h1>
+    </header>
+    <main class="main-content">
+        <section class="card">
+            <form id="uploadForm" class="upload-form"> 
+                <div class="file-upload">
+                    <label for="imageInput" class="upload-label">
+                         Choose an Image
+                        <input type="file" id="imageInput" accept="image/*" hidden />
+                    </label>
+                    <input type="text" class="file-path" placeholder="No file selected" readonly />
                 </div>
-                <button type="submit" id="scanBtn" class="btn" disabled>Analyze Image</button>
+                <button type="submit" id="scanBtn" class="scan-btn" disabled><i class="fas fa-search"></i> Scan</button>
             </form>
+            <div id="imagePreview" class="image-preview"></div>
         </section>
 
-        <section id="result" class="result swoop-in-delay-2">
-            <!-- Results will appear here -->
-        </section>
-    </div>
+        <div id="progressBar" class="progress-bar" style="display: none;">
+            <div class="progress-indeterminate"></div>
+        </div>
+
+        <section id="result" class="result-container"></section>
+    </main>
+    
+    <footer class="footer">
+        <p>&copy; 2024 Know Your Health Assistant</p>
+    </footer>
+    
+    <script type="module" src="index.js"></script>
 </body>
 </html>
-<style>
-    /* General Reset */
-body {
-    margin: 0;
-    padding: 0;
-    font-family: "Roboto", Arial, sans-serif;
-    color: #fff;
-    background-color: #0e101c;
-    overflow-x: hidden;
-}
-
-h1, h2 {
-    margin: 0;
-}
-
-/* Parallax Section */
-.parallax-container {
-    position: relative;
-    height: 100vh;
-    overflow: hidden;
-}
-
-.parallax {
-    background-image: url('https://source.unsplash.com/1600x900/?health,medical');
-    background-attachment: fixed;
-    background-size: cover;
-    background-position: center;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    text-align: center;
-}
-
-.parallax h1 {
-    font-size: 3rem;
-    color: #fff;
-    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    margin-bottom: 10px;
-    animation: swoopIn 1.2s ease forwards;
-}
-
-.parallax p {
-    font-size: 1.2rem;
-    color: #ddd;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    max-width: 600px;
-    margin: 0 auto;
-    animation: fadeIn 1.5s ease forwards;
-}
-
-.content-container {
-    padding: 30px;
-    background-color: #121528;
-}
-
-.form-section, .result {
-    max-width: 800px;
-    margin: 0 auto;
-    background: linear-gradient(145deg, #1a1e33, #141827);
-    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.5);
-    border-radius: 12px;
-    padding: 20px;
-    opacity: 0;
-    transform: translateY(50px);
-}
-
-/* Animations */
-.swoop-in {
-    animation: swoopIn 1.5s ease forwards;
-}
-
-.swoop-in-delay-1 {
-    animation: swoopIn 1.5s ease 0.5s forwards;
-}
-
-.swoop-in-delay-2 {
-    animation: swoopIn 1.5s ease 1s forwards;
-}
-
-@keyframes swoopIn {
-    0% {
-        opacity: 0;
-        transform: translateY(50px);
-    }
-    100% {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes fadeIn {
-    0% {
-        opacity: 0;
-    }
-    100% {
-        opacity: 1;
-    }
-}
-
-/* File Input */
-.file-input {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    margin: 20px 0;
-}
-
-.file-input input.file-path {
-    flex-grow: 1;
-    padding: 10px;
-    border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    color: #333;
-    background: #fff;
-}
-
-.file-input label {
-    padding: 10px 20px;
-    background: #007BFF;
-    border-radius: 8px;
-    color: #fff;
-    cursor: pointer;
-    transition: background 0.3s ease;
-}
-
-.file-input label:hover {
-    background: #0056b3;
-}
-
-/* Button Styles */
-.btn {
-    display: inline-block;
-    padding: 10px 20px;
-    border-radius: 8px;
-    border: none;
-    font-size: 1rem;
-    cursor: pointer;
-    background: linear-gradient(145deg, #007BFF, #6C63FF);
-    color: #fff;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
-    transition: background 0.3s ease, transform 0.2s ease;
-}
-
-.btn:hover {
-    background: linear-gradient(145deg, #0056b3, #4b3bdb);
-    transform: scale(1.05);
-}
-
-.btn:disabled {
-    background: #555;
-    cursor: not-allowed;
-}
-
-/* Results Section */
-.result {
-    margin-top: 40px;
-}
-
-.result-card {
-    background: #1e223d;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.3);
-    text-align: left;
-}
-
-.tag {
-    display: inline-block;
-    background: #007BFF;
-    color: #fff;
-    padding: 6px 12px;
-    border-radius: 20px;
-    margin: 5px;
-    font-size: 0.9rem;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .parallax h1 {
-        font-size: 2.5rem;
-    }
-
-    .parallax p {
-        font-size: 1rem;
-    }
-}
-
-</style>
